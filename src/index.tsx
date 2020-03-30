@@ -1,7 +1,14 @@
 import { Form as DefaultForm, Formik, FormikProps } from 'formik'
 import produce from 'immer'
 import React from 'react'
-import { Step as AlbusStep, Steps as AlbusSteps, Wizard as AlbusWizard, WizardContext } from 'react-albus'
+import {
+  Step as AlbusStep,
+  Steps as AlbusSteps,
+  Wizard as AlbusWizard,
+  WizardContext,
+} from 'react-albus'
+import { BrowserRouter, Route } from 'react-router-dom'
+console.log('using linked pkg12345')
 
 import {
   FormikWizardBaseValues,
@@ -161,43 +168,49 @@ export function FormikWizard<T>({
   const stepIds = React.useMemo(() => steps.map((step) => step.id), [steps])
 
   return (
-    <AlbusWizard {...albusProps}>
-      <FormikWizardContext.Provider
-        value={{
-          status,
-          setStatus,
-          values,
-          setValues,
-        }}
-      >
-        <AlbusSteps>
-          {steps.map((step) => (
-            <AlbusStep
-              key={step.id}
-              id={step.id}
-              render={(wizard) => (
-                <FormikWizardStep
-                  wizard={wizard}
-                  formikProps={formikProps}
-                  onSubmit={onSubmit}
-                  steps={stepIds}
-                  status={status}
-                  values={values}
-                  setValues={setValues}
-                  setStatus={setStatus}
-                  step={{
-                    ...step,
-                    initialValues: values[step.id] || {},
-                  }}
-                  Form={Form}
-                  FormWrapper={render}
-                />
-              )}
-            />
-          ))}
-        </AlbusSteps>
-      </FormikWizardContext.Provider>
-    </AlbusWizard>
+    <BrowserRouter>
+      <Route
+        render={({ history }) => (
+          <AlbusWizard history={history} {...albusProps}>
+            <FormikWizardContext.Provider
+              value={{
+                status,
+                setStatus,
+                values,
+                setValues,
+              }}
+            >
+              <AlbusSteps>
+                {steps.map((step) => (
+                  <AlbusStep
+                    key={step.id}
+                    id={step.id}
+                    render={(wizard) => (
+                      <FormikWizardStep
+                        wizard={wizard}
+                        formikProps={formikProps}
+                        onSubmit={onSubmit}
+                        steps={stepIds}
+                        status={status}
+                        values={values}
+                        setValues={setValues}
+                        setStatus={setStatus}
+                        step={{
+                          ...step,
+                          initialValues: values[step.id] || {},
+                        }}
+                        Form={Form}
+                        FormWrapper={render}
+                      />
+                    )}
+                  />
+                ))}
+              </AlbusSteps>
+            </FormikWizardContext.Provider>
+          </AlbusWizard>
+        )}
+      />
+    </BrowserRouter>
   )
 }
 
